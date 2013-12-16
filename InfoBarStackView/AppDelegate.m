@@ -61,8 +61,12 @@
 @property (weak) IBOutlet ImagePickerViewController *imagePickerDisclosureViewController;
 @property (weak) IBOutlet NSScrollView *contentScrollView;
 @property (weak) IBOutlet NSStackView *stackView;
+@property (weak) IBOutlet NSSplitView *splitView;
+@property (weak) IBOutlet NSView *splitViewRight;
 @property (strong) NSArray *stackViewConstraints;
 @property BOOL horizontalConstraintsApplied;
+@property (strong) id frameObserver;
+
 @end
 
 
@@ -93,9 +97,12 @@
     // let the fixed width subviews float centrally
     [stackView setHuggingPriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
     
+    // allow stackview clipping
+    BOOL clipStackViewHorz = YES;
+    
     // do not resist clipping horizontally.
-    // NSScrollView wrapper allow the clipped view to be scrolled into view.
-    if (YES) {
+    // NSScrollView wrapper will allow the clipped view to be scrolled into view.
+    if (clipStackViewHorz) {
         
         [stackView setClippingResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
     } else {
@@ -111,38 +118,49 @@
     // do not resist clipping vertically
     [stackView setClippingResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationVertical];
     
-    // add it to the scroll view
-    self.window.contentView = self.contentScrollView;
+    // add scrollview to splitview
+    NSScrollView *scrollView = self.contentScrollView;
+    scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSAssert(scrollView.contentView.isFlipped, @"ScrollView NSClipView must be flipped? Use TSClipView");
+    [self.splitViewRight  addSubview:self.contentScrollView];
+    NSDictionary *viewsDict = NSDictionaryOfVariableBindings(scrollView);
+    [self.splitViewRight addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[scrollView]-0-|" options:0 metrics:nil views:viewsDict]];
+    [self.splitViewRight addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[scrollView]-0-|" options:0 metrics:nil views:viewsDict]];
+
+    // add stack view to the scrollview
     [self.contentScrollView setDocumentView:stackView];
     
     // stack view width is constrained to match the scrollview width.
     // Note: this arrangement will not not show the horizontal scroller when clippng as the stackview width matches the scrollvew width.
     // to show the horiz scroller remove these constraints when the view size hits the minWidth limit.
-    NSDictionary *viewsDict = NSDictionaryOfVariableBindings(stackView);
+    viewsDict = NSDictionaryOfVariableBindings(stackView);
     self.stackViewConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[stackView]-0-|" options:0 metrics:nil views:viewsDict];
     [self.contentScrollView addConstraints:self.stackViewConstraints];
     self.horizontalConstraintsApplied = YES;
     
-    // observe the scroll view frame and update the horizontal constraint as required
-    [[NSNotificationCenter defaultCenter] addObserverForName:NSViewFrameDidChangeNotification
-                                                      object:self.contentScrollView queue:nil
-                                                  usingBlock:^(NSNotification *note)
-    {
-        if (self.contentScrollView.frame.size.width < minWidth) {
-            
-            if (self.horizontalConstraintsApplied) {
-                [self.contentScrollView removeConstraints:self.stackViewConstraints];
-                self.horizontalConstraintsApplied = NO;
+    if (clipStackViewHorz) {
+        
+        // observe the scroll view frame and update the horizontal constraint as required
+        self.frameObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSViewFrameDidChangeNotification
+                                                          object:self.contentScrollView queue:nil
+                                                      usingBlock:^(NSNotification *note)
+        {
+            if (self.contentScrollView.frame.size.width < minWidth) {
+                
+                if (self.horizontalConstraintsApplied) {
+                    [self.contentScrollView removeConstraints:self.stackViewConstraints];
+                    self.horizontalConstraintsApplied = NO;
+                }
+                
+            } else {
+                
+                if (!self.horizontalConstraintsApplied) {
+                    [self.contentScrollView addConstraints:self.stackViewConstraints];
+                    self.horizontalConstraintsApplied = YES;
+                }
             }
-            
-        } else {
-            
-            if (!self.horizontalConstraintsApplied) {
-                [self.contentScrollView addConstraints:self.stackViewConstraints];
-                self.horizontalConstraintsApplied = YES;
-            }
-        }
-    }];
+        }];
+    }
 }
 
 // -------------------------------------------------------------------------------
