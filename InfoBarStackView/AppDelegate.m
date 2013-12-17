@@ -60,7 +60,6 @@
 @property (weak) IBOutlet OtherViewController *otherDisclosureViewController;
 @property (weak) IBOutlet ImagePickerViewController *imagePickerDisclosureViewController;
 @property (weak) IBOutlet NSScrollView *contentScrollView;
-@property (weak) IBOutlet NSStackView *stackView;
 @property (weak) IBOutlet NSSplitView *splitView;
 @property (weak) IBOutlet NSView *splitViewRight;
 @property (strong) NSArray *stackViewConstraints;

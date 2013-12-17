@@ -423,7 +423,6 @@
                 <outlet property="shapeDisclosureViewController" destination="GRy-BM-2Ec" id="1dv-ai-J5v"/>
                 <outlet property="splitView" destination="KMA-T9-q2k" id="iBm-hY-a8z"/>
                 <outlet property="splitViewRight" destination="V87-sa-XPY" id="vBv-jZ-WHq"/>
-                <outlet property="stackView" destination="alE-MZ-E1f" id="xB7-yZ-CEJ"/>
                 <outlet property="window" destination="371" id="532"/>
             </connections>
         </customObject>
@@ -528,21 +527,5 @@
                 <autoresizingMask key="autoresizingMask"/>
             </scroller>
         </scrollView>
-        <customView horizontalHuggingPriority="1" id="Q3v-8s-wNl">
-            <rect key="frame" x="0.0" y="0.0" width="708" height="389"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <subviews>
-                <stackView orientation="vertical" alignment="centerX" horizontalHuggingPriority="249" verticalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="alE-MZ-E1f">
-                    <rect key="frame" x="114" y="20" width="480" height="349"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                </stackView>
-            </subviews>
-            <constraints>
-                <constraint firstItem="alE-MZ-E1f" firstAttribute="centerX" secondItem="Q3v-8s-wNl" secondAttribute="centerX" id="Geh-Pb-coy"/>
-                <constraint firstItem="alE-MZ-E1f" firstAttribute="top" secondItem="Q3v-8s-wNl" secondAttribute="top" constant="20" id="Shj-t4-G2h"/>
-                <constraint firstAttribute="bottom" secondItem="alE-MZ-E1f" secondAttribute="bottom" constant="20" symbolic="YES" placeholder="YES" id="cQd-aR-Spx"/>
-                <constraint firstItem="alE-MZ-E1f" firstAttribute="leading" secondItem="Q3v-8s-wNl" secondAttribute="leading" constant="114" placeholder="YES" id="e18-zL-S5I"/>
-            </constraints>
-        </customView>
     </objects>
 </document>
